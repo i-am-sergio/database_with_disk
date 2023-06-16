@@ -17,6 +17,7 @@ class Disco{
         int capacidadDelSector;
         
         int sectoresPorBloque;
+        int sizeBloque;
 
         int totalSectoresEnDisco;
         int totalPistasEnDisco;

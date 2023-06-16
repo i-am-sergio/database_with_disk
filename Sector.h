@@ -19,8 +19,7 @@ public:
         this->numDePista = numDePista;
         this->numDeSuperficie = numDeSuperficie;
         this->numDePlato = numDePlato;
-
-        cout<<"["<<idSector<<"]"<<numDePista<<"|"<<numDeSuperficie<<"|"<<numDePlato<<"\n";
+        //cout<<"["<<idSector<<"]"<<numDePista<<"|"<<numDeSuperficie<<"|"<<numDePlato<<"\n";
     }
 
     void write(){
