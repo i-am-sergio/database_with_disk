@@ -2,6 +2,7 @@
 #include "Disco.h"
 #include "DiskController.h"
 #include <fstream>
+#include <sstream>
 
 const int MAX_SIZE_PROMPT = 250 + 1;
 const int MAX_SIZE_TABLENAME = 64 + 1;
@@ -16,7 +17,7 @@ public:
         this->diskController = diskController;
     }
     ~SGDB(){}
-
+/*
     void createTable(char input[]){
         char * ptr = &input[13];
         char numAtributos[100];
@@ -87,7 +88,32 @@ public:
 
         cout<<"Query Ok! new table created\n";
     }
+*/
 
+void createTable(string prompt){
+      ofstream file;
+      file.open("esquema", fstream::app);
+      file.seekp(0,ios::beg);
+      string word;
+      stringstream stream(prompt);
+      getline(stream,word,' ');
+      file<<word<<'#';
+      getline(stream,word,' ');
+      file<<word;
+      //Escritura
+      getline(stream,word,' ');
+      string wor;
+      cout<<"Atributos:"<<endl;
+      //titanic 12 passengerid,int,survived,int,Pclass,int,Name,str,90,Sex,str,6,age,double,SibSp,int,Parch,int,Ticket,str,20,Fare,double,Cabin,str,20,Embarked,str,1
+      //Muestra las columnas de las tablas
+        stringstream stream1(word);
+        cout<<word<<endl;
+        while (getline(stream1,wor,',')) {
+          file<<"#"<<wor;
+        }
+
+      file.close();
+    }
 
     void extraerPalabra(const char* input, int inicio, int fin, char* palabra) {
         int longitud = fin-inicio+1;

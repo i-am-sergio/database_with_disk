@@ -33,16 +33,23 @@ int main(){
             cout<<"[3] Insert 1 registro n\n"; // ident si es fijo o variable de acuerdo al esquema de tablas, e insertarlo en binario
             cout<<"[4] Select 1 registro n\n";
             cout<<"[5] Delete 1 registro n\n";
-            
-            cout<<"  >> ";
             cin>>opc2;
             cin.ignore();
+
             if(opc2==1){
-                fgets(input,MAX_SIZE_PROMPT,stdin); // stdin: entrada por terminal
-                input[strcspn(input, "\n")] = '\0'; // Eliminar el caracter de nueva linea
-                sistema.createTable(input);
+                cout<<" >> ";
+                // fgets(input,MAX_SIZE_PROMPT,stdin); // stdin: entrada por terminal
+                // input[strcspn(input, "\n")] = '\0'; // Eliminar el caracter de nueva linea
+                // sistema.createTable(input);
+                string prompt;
+                getline(cin,prompt);
+                sistema.createTable(prompt);
             } else if(opc2==2){
-                cout<<"...";
+                //myDiskController.uploadTableToDisk("titanic.csv");
+                string prompt, prompt2;
+                getline(cin,prompt);
+                getline(cin,prompt2);
+                myDiskController.uploadTableToDisk(prompt,prompt2);
             }
 
         } else if(opc==0){
