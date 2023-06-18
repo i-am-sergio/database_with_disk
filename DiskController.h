@@ -85,23 +85,12 @@ public:
 
     void uploadTableToDisk(string fileToImport, string tablaName){ //(const char * tablaNameFile, int sizeFile)
         // prepareCSV_inTuplas(tablaNameFile);
+        
         tableToVector(tablaName);
         convertCSV_inTuplas(fileToImport,tablaName,info.size());
 
         const char* carpetaDisco = "disco\\";
 
-
-        // string path = string(carpetaDisco)+string(tablaNameFile); // disco/titanic
-        
-        // ifstream file(tablaNameFile);
-        // ifstream esquema("esquema");
-        // ofstream escribirEnDisco(path,ios::app);
-        // if (!file.is_open()) { cout << "No se pudo abrir el archivo " << path << endl; return; }
-        // if (!escribirEnDisco.is_open()) { cout << "No se pudo abrir el archivo " << path << endl; return; }
-        
-        //int pos = findEsquemaDeTabla("titanic"); // ubicacion de esquema de tabla
-        //vector<string> tipos = {"int","int","int","str 90","str 6","double","int","int","str 20","double","str 20","str 1"};        
-        
         int contador = 0;
         
         char caracter;
@@ -219,7 +208,6 @@ public:
     }
 
     void convertCSV_inTuplas(string fileAimportar, string newfile,int natributos){
-        //cout<<consulta[2]<<"-"<<consulta[4]<<endl;
 
         ifstream i(fileAimportar, ios::in); 
         ofstream f(newfile,ios::out); 
@@ -230,23 +218,21 @@ public:
         char caracter;
         while (i.get(caracter)) {
             if (((caracter == ',')||(caracter =='\n')) && reemplazarActivo == true ) {
-            if(indice<natributos){ //natributos
-                f<<word;
-                f<<'#';
-                word="";
-                indice++;
-                if (indice >= natributos) { //natributos
-                indice=0;
-                f<<'\n';
+                if(indice<natributos){ //natributos
+                    f<<word;
+                    f<<'#';
+                    word="";
+                    indice++;
+                    if (indice >= natributos) { //natributos
+                        indice=0;
+                        f<<'\n';
+                    }
                 }
-            }
-            }
-            else if(caracter == '"'){
-            reemplazarActivo = (!reemplazarActivo);
-            }
-            else{
-            if(caracter != '\r')
-                word+=caracter;
+            } else if(caracter == '"'){
+                reemplazarActivo = (!reemplazarActivo);
+            } else{
+                if(caracter != '\r')
+                    word+=caracter;
             }
         }
         cout << "Archivo importado exitosamente." << endl;
@@ -292,8 +278,6 @@ public:
         salida.close();
         cout << "Se ha generado tupla_" << CSVName << endl;
     }
-
-
 
     int findEsquemaDeTabla(const char * tablaName){
         ifstream esquemaTabla("esquema.txt");

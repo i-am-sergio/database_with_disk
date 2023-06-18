@@ -50,6 +50,9 @@ int main(){
                 getline(cin,prompt);
                 getline(cin,prompt2);
                 myDiskController.uploadTableToDisk(prompt,prompt2);
+            } else if(opc2==3){
+                sistema.mostrarPage(1);
+                cout<<"termina sistema.mostrarPage() ----";
             }
 
         } else if(opc==0){
