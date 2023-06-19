@@ -5,6 +5,7 @@
 #include <sstream>
 #include <tuple>
 #include "Disco.h"
+#include "tipos.cpp"
 using namespace std;
 
 class DiskController{
@@ -67,8 +68,17 @@ public:
       while (!stream.eof()) {
           getline(stream,w1,'#');
           getline(stream,w2,'#');
-          if ((w2 == "float") | (w2 == "int") | (w2 == "double")){
-            info.push_back(make_tuple(w1,w2,0));
+          if ((w2 == "int")){
+            info.push_back(make_tuple(w1,w2,mytipos::_INT));
+            continue;
+          } else if(w2 == "double"){
+            info.push_back(make_tuple(w1,w2,mytipos::_DOUBLE));
+            continue;
+          } else if(w2 == "float"){
+            info.push_back(make_tuple(w1,w2,mytipos::_FLOAT));
+            continue;
+          } else if(w2 == "bool"){
+            info.push_back(make_tuple(w1,w2,mytipos::_BOOL));
             continue;
           }
           getline(stream,w3,'#');
@@ -85,7 +95,7 @@ public:
 
     void uploadTableToDisk(string fileToImport, string tablaName){ //(const char * tablaNameFile, int sizeFile)
         // prepareCSV_inTuplas(tablaNameFile);
-        
+
         tableToVector(tablaName);
         convertCSV_inTuplas(fileToImport,tablaName,info.size());
 
@@ -103,18 +113,6 @@ public:
         
         char c;
         char z;
-        // while (archivoTupla.get(c)) // Ignora la primera linea (Debe ser remplazado por reconocer la estuctura de la tabla)
-        // {
-        //     if (c=='\n') break;
-        // }
-
-        /* por cada bloque
-        int sizeLinea = 173;
-        char * buffer = new char[sizeLinea];
-        salida.write(reinterpret_cast<char*>(&buffer), sizeof(buffer));
-        delete [] buffer;
-        
-        */
 
         string linea;
         string palabra;
@@ -189,10 +187,12 @@ public:
         
         while(contAux <= sizeFile){
             ofstream bloque("disk/bloque"+std::to_string(contador)+".bin", std::ios::binary);
-            bloque.seekp(sizeRegistro);
+            bloque.seekp(sizeRegistro-sizeof(int));
+            int freelist = 0; //puntero inicial de la freelist que se inicializara en 0
+            bloque.write(reinterpret_cast<char*>(&freelist), sizeof(int));
 
             contadorBytesTotal = sizeRegistro*2;
-            while(contadorBytesTotal <= sizeBloque){
+            while(contadorBytesTotal <= sizeBloque){ // sizeRegistro <= (sizeBloque-contadorBytesTotal)
                 char* buffer = new char[sizeRegistro];
                 file.read(buffer,sizeRegistro);
                 bloque.write(buffer,sizeRegistro);
@@ -200,6 +200,23 @@ public:
                 contAux += contadorBytesTotal;
                 delete [] buffer;
             }
+
+            char caracterVacio = '\0';
+
+            cout<<"\t\t aquiiiii->>>"<<sizeBloque-contadorBytesTotal+sizeRegistro<<"<-----"<<endl;
+            char * buffer = new char[sizeBloque-contadorBytesTotal+sizeRegistro];
+            // Rellenar el buffer con datos (en este ejemplo, caracteres 'A')
+            for (int j = 0; j < (sizeBloque - contadorBytesTotal+sizeRegistro); j++) {
+                buffer[j] = ' ';
+            }
+            bloque.write(buffer, (sizeBloque - contadorBytesTotal+sizeRegistro));
+            delete [] buffer;
+
+            /*for(int i=0;i<sizeBloque-contadorBytesTotal;i++){
+                bloque.write(reinterpret_cast<char*>(caracterVacio),sizeof(char));
+            }
+            cout<<"\nllego Aqui ------------\n";*/
+
             bloque.close();
             contador++;
             
