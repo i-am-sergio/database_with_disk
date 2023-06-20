@@ -35,6 +35,11 @@ int main(){
                 cout<<"Ingrese un numero de sector => ";
                 cin>>numSector;
                 myDiskController.printSector(numSector);
+            } else if(opc2==2){
+                int numBloque;
+                cout<<"Ingrese un numero de sector => ";
+                cin>>numBloque;
+                myDiskController.printBloque(numBloque);
             }
 
         } else if(opc==2){

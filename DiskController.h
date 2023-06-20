@@ -7,6 +7,7 @@
 #include <cmath>
 #include "Disco.h"
 #include "tipos.cpp"
+#include "design/lineas.cpp"
 using namespace std;
 
 class DiskController{
@@ -234,9 +235,9 @@ public:
 
             cout<<"\t\t bloque "<<contador<<"->>>"<<sizeBloque-contadorBytesTotal+sizeRegistro<<"<-----"<<endl;
             char * buffer = new char[sizeBloque-contadorBytesTotal+sizeRegistro];
-            // Rellenar el buffer con datos (en este ejemplo, caracteres 'A')
+            // Rellenar el buffer con datos (en este ejemplo, caracteres ' ')
             for (int j = 0; j < (sizeBloque - contadorBytesTotal+sizeRegistro); j++) {
-                buffer[j] = ' ';
+                buffer[j] = '\0';
             }
             bloque.write(buffer, (sizeBloque - contadorBytesTotal+sizeRegistro));
             delete [] buffer;
@@ -265,23 +266,31 @@ public:
     }
 
     void printSector(int numSector){
-        cout<<"\n--------------- | Sector "<<numSector<<" | ---------------\n";
-        cout<<"numBloques"<<this->disco->getNumBloques()<<" \n";
-
+        cout<<"\n"<<lineas::drawLinea(75)<<" | SECTOR "<<numSector<<" | "<<lineas::drawLinea(75)<<"\n";
+        this->disco->sectores[numSector-1].showInfoSector(); // Imprime info: en que plato, superficie, pista esta
+        
         int findNumBloqueQueApuntaAlSector = std::ceil(static_cast<double>(numSector) / this->numSectoresPorBloque);
         int numSectorDentroDelBloque = numSector % this->numSectoresPorBloque;
         int posicionDelSectorEnArchivo = numSectorDentroDelBloque * this->disco->capacidadDelSector;
+        // cout<<"findNumBloqueQueApuntaAlSector: "<<findNumBloqueQueApuntaAlSector<<"\n";
         
-        cout<<"findNumBloqueQueApuntaAlSector: "<<findNumBloqueQueApuntaAlSector<<"\n";
+        cout<<"DATA:\n"<<lineas::linea100<<lineas::linea50<<"\n";
         ifstream bloqueUbicado("disk/bloque"+std::to_string(findNumBloqueQueApuntaAlSector)+".bin",ios::binary);
         bloqueUbicado.seekg(posicionDelSectorEnArchivo);
-        char c;
+        char c; int contadorFila = 1;
         while(!bloqueUbicado.eof() ){
             bloqueUbicado.read(static_cast<char*>(&c),sizeof(char));
             cout << static_cast<int>(c);
+            contadorFila++;
+            //if(contadorFila%125==0){ cout<<"\n"; }
         }
         bloqueUbicado.close();
-        
+
+        cout<<"\n"<<lineas::linea100<<lineas::linea50<<"\n";
+    }
+
+    void printBloque(int numBloque){
+
     }
 
     void convertCSV_inTuplas(string fileAimportar, string newfile,int natributos){

@@ -63,6 +63,9 @@ public:
         cout<<">>>>>>>>> sizeRegisto = "<<sizeRegistro;
 
         char * frame = new char[this->diskController->sizeBloque];
+
+        //char * frame = this->bufferManager->getPageOfBuuferPool(1)->data;
+
         ifstream file;
         file.open("disk/bloque"+to_string(pageId)+".bin",ios::in | ios::binary);
         file.read(frame,this->diskController->sizeBloque);

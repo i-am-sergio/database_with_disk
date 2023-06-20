@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include "design/symbols.cpp"
 using namespace std;
 
 class Sector{
@@ -19,10 +20,13 @@ public:
         this->numDePista = numDePista;
         this->numDeSuperficie = numDeSuperficie;
         this->numDePlato = numDePlato;
-        //cout<<"["<<idSector<<"]"<<numDePista<<"|"<<numDeSuperficie<<"|"<<numDePlato<<"\n";
+    }
+    
+    void showInfoSector() {
+        std::cout << "\t" <<symbols::guionCuadrado << " IdSector: " << idSector << std::endl;
+        std::cout << "\t" <<symbols::guionCuadrado << " numDePista: " << numDePista << std::endl;
+        std::cout << "\t" <<symbols::guionCuadrado << " numDeSuperficie: " << numDeSuperficie << std::endl;
+        std::cout << "\t" <<symbols::guionCuadrado << " numDePlato: " << numDePlato << std::endl;
     }
 
-    void write(){
-
-    }
 };
