@@ -50,6 +50,7 @@ int main(){
             cout<<"[3] Insert 1 registro n\n"; // ident si es fijo o variable de acuerdo al esquema de tablas, e insertarlo en binario
             cout<<"[4] Select 1 registro n\n";
             cout<<"[5] Delete 1 registro n\n";
+            cout<<"[6] SELECT * FROM titanic\n";
             cin>>opc2;
             cin.ignore();
 
@@ -73,6 +74,8 @@ int main(){
                 sistema.mostrarPage(41);
                 sistema.mostrarPage(42);
                 cout<<"\n---\n";
+            } else if(opc2==6){
+                sistema.showTable("titanic");
             }
 
         } else if(opc==0){

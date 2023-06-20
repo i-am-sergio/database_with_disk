@@ -54,7 +54,7 @@ public:
 
     void mostrarPage(int pageId) { // MostrarBloque
         this->diskController->tableToVector("titanic");     
-        
+        int comprobarRegistro; 
         int sizeRegistro = 0;
         for(auto& i : this->diskController->info){
             sizeRegistro += get<2>(i);
@@ -62,29 +62,42 @@ public:
         
         cout<<">>>>>>>>> sizeRegisto = "<<sizeRegistro;
 
-        char * frame = new char[this->diskController->sizeBloque];
-
-        //char * frame = this->bufferManager->getPageOfBuuferPool(1)->data;
-
+        //char * frame = new char[this->diskController->sizeBloque];
+        cout<<"aqui sizebloque->>>>>> "<<this->bufferManager->getPageOfBuuferPool(pageId)->sizePage<<endl;
+        char * frame = bufferManager->getPageOfBuuferPool(pageId)->data;
+        cout<<"llego aqui"<<endl;
         ifstream file;
         file.open("disk/bloque"+to_string(pageId)+".bin",ios::in | ios::binary);
         file.read(frame,this->diskController->sizeBloque);
+        
+        char marcador;
+        marcador = *reinterpret_cast<char *>(frame + sizeRegistro-5);
         int byte = 0;
-        byte+=(sizeRegistro)-4;
-        cout<<"Freelist -> ";
-        fun_int(frame,byte,4);
-        cout<<endl;
+        if (marcador != '*') {
+          byte+=(sizeRegistro)-4;
+          cout<<"Freelist -> ";
+          fun_int(frame,byte,4);
+          cout<<endl;
+        }
+        
+
         for (int i=1; i<(this->diskController->sizeBloque / sizeRegistro); i++) {
+
+        char marcador;
+        marcador = *reinterpret_cast<char *>(frame + ((i+1)*sizeRegistro)-5);
+        //cout<<"aqui marcador ->"<<marcador<<endl;
+          if (marcador != '*') {
             for(auto& i : this->diskController->info){
-                if (get<1>(i)=="int"){
-                    fun_int(frame,byte,mytipos::_INT);
-                } else if(get<1>(i)=="double"){
-                    fun_double(frame,byte,mytipos::_DOUBLE);
-                } else if(get<1>(i)=="str"){
-                    fun_char(frame,byte,get<2>(i));
-                }
+              if (get<1>(i)=="int"){
+                  fun_int(frame,byte,mytipos::_INT);
+              } else if(get<1>(i)=="double"){
+                  fun_double(frame,byte,mytipos::_DOUBLE);
+              } else if(get<1>(i)=="str"){
+                  fun_char(frame,byte,get<2>(i));
+              }
             }
             cout<<"\n";
+          }
         }
         file.close();
 
@@ -103,6 +116,18 @@ public:
         // file.close();
     }
 
+    void showTable(string nameTable){
+        int numRegistros;
+        this->diskController->tableToVector("titanic");
+        ifstream numRegistros_dictionary("dictionary/numRegistros.bin", std::ios::binary);
+        numRegistros_dictionary.read(reinterpret_cast<char*>(&numRegistros), sizeof(int));
+        numRegistros_dictionary.close(); 
+
+        for (int i = 1; i<=41; i++) {
+        mostrarPage(i); 
+        }
+    }
+    
     void fun_int(char *frame, int &byte, int sizeBytes)
     {
         int pru;

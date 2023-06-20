@@ -36,7 +36,7 @@ public:
                 char * buffer = new char[sizeBloque];
                 // Rellenar el buffer con datos (en este ejemplo, caracteres 'A')
                 for (int j = 0; j < sizeBloque; j++) {
-                    buffer[j] = '\0';
+                    buffer[j] = '*';
                 }
                 archivo.write(buffer, sizeBloque);
                 
@@ -187,21 +187,22 @@ public:
             }
         }
         setDataInBloques(sizeRegistro);
-        readSchemaBloquesFijos();
+        //readSchemaBloquesFijos();
     }
 
-    void setDataInBloques(int sizeRegistro){
+void setDataInBloques(int sizeRegistro){
+
         int contador = 1;
         int contadorBytesTotal;
         int contAux = 0;
-        int numRegistros;
+        int numRegistros=0;
 
         ifstream numRegistros_dictionary("dictionary/numRegistros.bin", std::ios::binary);
         numRegistros_dictionary.read(reinterpret_cast<char*>(&numRegistros), sizeof(int));
         numRegistros_dictionary.close();
 
         ifstream file("titanicbinario.bin", std::ios::binary);
-        ofstream schemaBloques("schemaBloquesFijos.bin", std::ios::binary);
+        //ofstream schemaBloques("schemaBloquesFijos.bin", std::ios::binary);
         
         file.seekg(0,ios::end);
         int sizeFile = file.tellg();
@@ -211,33 +212,34 @@ public:
         
         int contadorRegistros = 0;
 
-        while((contAux < almacenamientoTotal) && (contadorRegistros <= numRegistros)){ //sizeFile
+        while((contAux < almacenamientoTotal) && (contadorRegistros < numRegistros)){ //sizeFile
             ofstream bloque("disk/bloque"+std::to_string(contador)+".bin", std::ios::binary);
-            bloque.seekp(sizeRegistro-sizeof(int));
-            int freelist = 0; //puntero inicial de la freelist que se inicializara en 0
-            bloque.write(reinterpret_cast<char*>(&freelist), sizeof(int));
+            bloque.seekp(sizeRegistro-sizeof(int)-sizeof(char));
 
+            int freelist = 0; //puntero inicial de la freelist que se inicializara en 0
+            char marcador = '-'; //puntero inicial de la freelist que se inicializara en 0
+            bloque.write(reinterpret_cast<char*>(&marcador), sizeof(char));
+            bloque.write(reinterpret_cast<char*>(&freelist), sizeof(int));
             contadorBytesTotal = sizeRegistro*2;
             
-            while((contadorBytesTotal <= sizeBloque) && (contadorRegistros <= numRegistros)){ // sizeRegistro <= (sizeBloque-contadorBytesTotal)
+            while((contadorBytesTotal <= sizeBloque) && (contadorRegistros < numRegistros)){ // sizeRegistro <= (sizeBloque-contadorBytesTotal)
                 char* buffer = new char[sizeRegistro];
                 file.read(buffer,sizeRegistro);
                 bloque.write(buffer,sizeRegistro);
                 contadorBytesTotal += sizeRegistro;
                 delete [] buffer;
                 contadorRegistros++;
+                //cout<<"contadorRegistros ->>>>>>>>>>> "<<contadorRegistros<<endl;
             }
 
             contAux += (contadorBytesTotal-sizeRegistro);
-            int numRegistrosEnBloque = (contAux / (sizeRegistro*contador)) - 1;
-            schemaBloques.write(reinterpret_cast<char*>(&numRegistrosEnBloque), sizeof(int));
-
-
-            cout<<"\t\t bloque "<<contador<<"->>>"<<sizeBloque-contadorBytesTotal+sizeRegistro<<"<-----"<<endl;
+            //int numRegistrosEnBloque = (contAux / (sizeRegistro*contador)) - 1;
+            //schemaBloques.write(reinterpret_cast<char*>(&numRegistrosEnBloque), sizeof(int));
+            
             char * buffer = new char[sizeBloque-contadorBytesTotal+sizeRegistro];
-            // Rellenar el buffer con datos (en este ejemplo, caracteres ' ')
+            // Rellenar el buffer con datos 
             for (int j = 0; j < (sizeBloque - contadorBytesTotal+sizeRegistro); j++) {
-                buffer[j] = '\0';
+                buffer[j] = '*';
             }
             bloque.write(buffer, (sizeBloque - contadorBytesTotal+sizeRegistro));
             delete [] buffer;
@@ -250,7 +252,7 @@ public:
             
         }
         file.close();
-        schemaBloques.close();
+        //schemaBloques.close();
     }
 
     void readSchemaBloquesFijos(){
