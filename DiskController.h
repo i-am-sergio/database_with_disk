@@ -4,6 +4,7 @@
 #include <string>
 #include <sstream>
 #include <tuple>
+#include <cmath>
 #include "Disco.h"
 #include "tipos.cpp"
 using namespace std;
@@ -13,12 +14,14 @@ public:
     Disco * disco;
     int nTotalBloques;
     int sizeBloque;
+    int numSectoresPorBloque;
     vector<tuple<string,string,int>> info;
     
     DiskController(Disco* disco){
         this->disco = disco;
         this->nTotalBloques = disco->getNumBloques();
         this->sizeBloque = disco->capacidadDelSector * disco->sectoresPorBloque;
+        this->numSectoresPorBloque = disco->sectoresPorBloque;
 
         if(!system("mkdir disk")){ // si no existen bloques, los crea. 
             for(int i=1; i<= nTotalBloques; i++){
@@ -259,6 +262,26 @@ public:
             i++;
         }
         schemaBloques.close();
+    }
+
+    void printSector(int numSector){
+        cout<<"\n--------------- | Sector "<<numSector<<" | ---------------\n";
+        cout<<"numBloques"<<this->disco->getNumBloques()<<" \n";
+
+        int findNumBloqueQueApuntaAlSector = std::ceil(static_cast<double>(numSector) / this->numSectoresPorBloque);
+        int numSectorDentroDelBloque = numSector % this->numSectoresPorBloque;
+        int posicionDelSectorEnArchivo = numSectorDentroDelBloque * this->disco->capacidadDelSector;
+        
+        cout<<"findNumBloqueQueApuntaAlSector: "<<findNumBloqueQueApuntaAlSector<<"\n";
+        ifstream bloqueUbicado("disk/bloque"+std::to_string(findNumBloqueQueApuntaAlSector)+".bin",ios::binary);
+        bloqueUbicado.seekg(posicionDelSectorEnArchivo);
+        char c;
+        while(!bloqueUbicado.eof() ){
+            bloqueUbicado.read(static_cast<char*>(&c),sizeof(char));
+            cout << static_cast<int>(c);
+        }
+        bloqueUbicado.close();
+        
     }
 
     void convertCSV_inTuplas(string fileAimportar, string newfile,int natributos){

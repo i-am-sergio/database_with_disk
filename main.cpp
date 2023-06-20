@@ -24,7 +24,19 @@ int main(){
         cout<<"[2] Menu del sistema de Base de Datos\n";
         cin>>opc;
         if(opc==1){
-            cout<<"etc\n";
+            int opc2;
+            cout<<"[1] Imprimir Metadata Sector n\n";
+            cout<<"[2] Imprimir Metadata Bloque n\n";
+            cout<<"[3] Imprimir Metadata Registro n\n";
+            cin>>opc2;
+            cin.ignore();
+            if(opc2==1){
+                int numSector;
+                cout<<"Ingrese un numero de sector => ";
+                cin>>numSector;
+                myDiskController.printSector(numSector);
+            }
+
         } else if(opc==2){
 
             int opc2;
