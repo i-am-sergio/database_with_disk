@@ -1,3 +1,5 @@
+#pragma once
+
 namespace mytipos{
     const int _INT = 4;
     const int _DOUBLE = 8;

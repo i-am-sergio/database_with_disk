@@ -9,7 +9,7 @@ char input[MAX_SIZE_PROMPT];
 
 
 int main(){
-    Disco myDisk("structDisk.bin",5,8,20,100,10);
+    Disco myDisk("structDisk.bin",4,8,20,512,8);
     DiskController myDiskController(&myDisk);
     SGDB sistema(&myDisk,& myDiskController);
 
@@ -51,8 +51,11 @@ int main(){
                 getline(cin,prompt2);
                 myDiskController.uploadTableToDisk(prompt,prompt2);
             } else if(opc2==3){
-                sistema.mostrarPage(1);
-                cout<<"termina sistema.mostrarPage() ----";
+                cout<<"MUESTRA BLOQUE 100 ----\n";
+                sistema.mostrarPage(40);
+                sistema.mostrarPage(41);
+                sistema.mostrarPage(42);
+                cout<<"\n---\n";
             }
 
         } else if(opc==0){

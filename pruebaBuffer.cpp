@@ -31,14 +31,14 @@ void fun_char(char * frame, int & byte, int sizeBytes){
   }
   std::cout <<"|";
 }
-int main()
-{
+int main() {
     const int size_registro = 173;
     const int size_bloque = 1000; 
     char * frame = new char[size_bloque];
     ifstream file;
     file.open("disk/bloque1.bin",ios::in | ios::binary);
     file.read(frame,size_bloque);
+
     cout<<"aqui"<<endl;
     int byte =0;
     byte+=173-4;
