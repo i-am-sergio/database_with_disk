@@ -280,10 +280,13 @@ void setDataInBloques(int sizeRegistro){
         ifstream bloqueUbicado("disk/bloque"+std::to_string(findNumBloqueQueApuntaAlSector)+".bin",ios::binary);
         bloqueUbicado.seekg(posicionDelSectorEnArchivo);
         char c; int contadorFila = 1;
-        while(!bloqueUbicado.eof() ){
+        int i=0;
+        while(i<this->disco->capacidadDelSector){
             bloqueUbicado.read(static_cast<char*>(&c),sizeof(char));
-            cout << static_cast<int>(c);
+            cout << c;
+            //cout << static_cast<int>(c);
             contadorFila++;
+            i++;
             //if(contadorFila%125==0){ cout<<"\n"; }
         }
         bloqueUbicado.close();
