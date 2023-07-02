@@ -5,7 +5,7 @@
 #include <sstream>
 #include <tuple>
 #include <cmath>
-#include "Disco.h"
+#include "HeadersHDD/Disco.h"
 #include "tipos.cpp"
 #include "design/lineas.cpp"
 using namespace std;
@@ -16,6 +16,7 @@ public:
     int nTotalBloques;
     int sizeBloque;
     int numSectoresPorBloque;
+    int NumBLoquesEnUso;
     vector<tuple<string,string,int>> info;
     
     DiskController(Disco* disco){
@@ -24,35 +25,149 @@ public:
         this->sizeBloque = disco->capacidadDelSector * disco->sectoresPorBloque;
         this->numSectoresPorBloque = disco->sectoresPorBloque;
 
+        int sectorActual = 1;
         if(!system("mkdir disk")){ // si no existen bloques, los crea. 
             for(int i=1; i<= nTotalBloques; i++){
                 string name_bloque = "bloque";
                 name_bloque += to_string(i);
                 ofstream archivo("disk/"+name_bloque+".bin", std::ios::binary);
 
+                char* buffer = new char[sizeBloque];
+
                 // std::ofstream archivo("datos.bin", std::ios::binary);
                 if (!archivo) { std::cout << "No se pudo abrir el archivo." << std::endl; return; }
-                // char buffer[sizeBloque];
-                char * buffer = new char[sizeBloque];
-                // Rellenar el buffer con datos (en este ejemplo, caracteres 'A')
-                for (int j = 0; j < sizeBloque; j++) {
-                    buffer[j] = '*';
+                
+                int _pista,_superf,_plat;
+                for(int i=0; i<numSectoresPorBloque;i++){
+                  _pista = ((sectorActual) % disco->numSectoresPorPista == 0) ? ((sectorActual)/disco->numSectoresPorPista) : ((sectorActual)/disco->numSectoresPorPista)+1;
+                  _superf = (_pista % disco->numPistasPorSuperficie == 0) ? (_pista/disco->numPistasPorSuperficie) : (_pista/disco->numPistasPorSuperficie)+1;
+                  _plat = (_superf % 2 == 0) ? (_superf/2) : (_superf/2)+1;
+
+                  ifstream input("HDD/Plato" + to_string(_plat)+"/Superficie"+to_string(_superf)+"/Pista"+to_string(_pista)+"/Sector"+to_string(sectorActual)+".bin", std::ios::binary);
+                  
+                  input.read(buffer + disco->capacidadDelSector * i, disco->capacidadDelSector);
+                  input.close();
+                  sectorActual++;
                 }
+
                 archivo.write(buffer, sizeBloque);
-                
                 delete [] buffer;
-                //delete buffer;
-                
                 archivo.close();
             }
             std::cout << "Se han generado los bloques correctamente" << std::endl;
-        } else {
-            std::cout << "Se ha cargado la estructura de los bloques existente" << std::endl;
         }
 
     }
     ~DiskController(){
-        //system("rmdir /s /q disk");
+        system("rmdir /s /q disk");
+    }
+
+    void setBloque_SlottedPage(int bloqueNum){
+        fstream bloque("disk/bloque"+to_string(bloqueNum)+".bin", ios::in | ios::out | ios::binary);
+        bloque.seekp(0); 
+        
+        int numEntradas = 0;
+        bloque.write(reinterpret_cast<char*>(&numEntradas), sizeof(int));
+        int finalDeFreeSpace = sizeBloque;
+        bloque.write(reinterpret_cast<char*>(&finalDeFreeSpace), sizeof(int));
+
+        bloque.close();
+    }
+
+    void WriteDataRegistroEnBloque(int bloqueNum, int sizeRegistro, char * data, string tablaname){
+        fstream bloque("disk/bloque"+to_string(bloqueNum)+".bin", ios::in | ios::out | ios::binary);
+        bloque.seekp(0);
+        bloque.seekg(0);
+
+        int numEntradas;
+        bloque.read(reinterpret_cast<char*>(&numEntradas), sizeof(int));
+        numEntradas++;
+        bloque.write(reinterpret_cast<char*>(&(numEntradas)), sizeof(int));
+
+        int finalDeFreeSpace;
+        bloque.read(reinterpret_cast<char*>(&finalDeFreeSpace), sizeof(int));
+        finalDeFreeSpace -= sizeRegistro;
+        bloque.write(reinterpret_cast<char*>(&finalDeFreeSpace), sizeof(int));
+
+        tableToVector(tablaname);
+        bloque.seekp(9);
+        // bloque.seekp(finalDeFreeSpace - sizeRegistro);
+        bloque.write(data, sizeRegistro);
+        
+        // Llama al disco y escribe en disco
+    }
+
+    void readPrueba_SlottedPage(int bloqueNum){
+        fstream bloque("disk/bloque"+to_string(bloqueNum)+".bin", ios::in | ios::out | ios::binary);
+        int num; 
+        int num2;
+        bloque.seekg(0);
+        bloque.read(reinterpret_cast<char*>(&num), sizeof(num));
+        bloque.read(reinterpret_cast<char*>(&num2), sizeof(num2));
+        cout<<"aux1 = "<<num<<" \t\taux2 ="<<num2<<endl;
+        bloque.close();
+    }
+
+    void variableTableToVector(string nameTable){
+        this->info.clear();
+        ifstream data;
+        data.open("dictionary/variableSchema",ios::in);
+        string linea;
+        while(getline(data,linea)){
+            stringstream stream(linea);
+            string word;
+            getline(stream,word,'#');
+            if (word == nameTable) {
+                break;
+            }
+        }
+        //Lleva a la memoria dinamica la ubicacion de los bytes por cada atributo
+        //cout<<linea<<endl;
+        stringstream stream(linea);
+        string w1,w2,w3;
+        getline(stream,w1,'#');
+        getline(stream,w1,'#');
+        while (!stream.eof()) {
+            getline(stream,w1,'#');
+            getline(stream,w2,'#');
+            if ((w2 == "int")){
+                info.push_back(make_tuple(w1,w2,mytipos::_INT));
+                continue;
+            } else if(w2 == "double"){
+                info.push_back(make_tuple(w1,w2,mytipos::_DOUBLE));
+                continue;
+            } else if(w2 == "float"){
+                info.push_back(make_tuple(w1,w2,mytipos::_FLOAT));
+                continue;
+            } else if(w2 == "bool"){
+                info.push_back(make_tuple(w1,w2,mytipos::_BOOL));
+                continue;
+            }
+            getline(stream,w3,'#');
+            info.push_back(make_tuple(w1,w2,stoi(w3)));
+        }
+        data.close();
+    }
+
+
+    void bloqueASector(int nBloque){
+      ifstream archivo("disk/bloque"+to_string(nBloque)+".bin", std::ios::binary);
+        for (int i=1; i<=numSectoresPorBloque; i++) {
+          int nSector = numSectoresPorBloque*(nBloque-1) + i;
+          cout<<"nSector -> "<<nSector<<endl;
+          int _pista,_superf,_plat;
+          _pista = ((nSector) % disco->numSectoresPorPista == 0) ? ((nSector)/disco->numSectoresPorPista) : ((nSector)/disco->numSectoresPorPista)+1;
+          _superf = (_pista % disco->numPistasPorSuperficie == 0) ? (_pista/disco->numPistasPorSuperficie) : (_pista/disco->numPistasPorSuperficie)+1;
+          _plat = (_superf % 2 == 0) ? (_superf/2) : (_superf/2)+1;
+          ofstream output("HDD/Plato" + to_string(_plat)+"/Superficie"+to_string(_superf)+"/Pista"+to_string(_pista)+"/Sector"+to_string(nSector)+".bin", std::ios::binary);
+          
+          char* buffer = new char[disco->capacidadDelSector];
+          archivo.read(buffer, disco->capacidadDelSector);
+          output.write(buffer, disco->capacidadDelSector);
+          delete [] buffer;
+          output.close();
+        }
+      archivo.close();
     }
 
     void tableToVector(string nameTable){
@@ -189,7 +304,8 @@ public:
         //readSchemaBloquesFijos();
     }
 
-    void setDataInBloques(int sizeRegistro){
+void setDataInBloques(int sizeRegistro){
+
         int contador = 1;
         int contadorBytesTotal;
         int contAux = 0;
@@ -246,10 +362,13 @@ public:
             cout<<"contAux: "<<contAux<<"\t\t";
 
             bloque.close();
+
+            bloqueASector(contador);
             contador++;
             
         }
         file.close();
+        this->NumBLoquesEnUso = contador;
         //schemaBloques.close();
     }
 
@@ -263,34 +382,6 @@ public:
             i++;
         }
         schemaBloques.close();
-    }
-
-    void printSector(int numSector){
-        cout<<"\n"<<lineas::drawLinea(75)<<" | SECTOR "<<numSector<<" | "<<lineas::drawLinea(75)<<"\n";
-        this->disco->sectores[numSector-1].showInfoSector(); // Imprime info: en que plato, superficie, pista esta
-        
-        int findNumBloqueQueApuntaAlSector = std::ceil(static_cast<double>(numSector) / this->numSectoresPorBloque);
-        int numSectorDentroDelBloque = numSector % this->numSectoresPorBloque;
-        int posicionDelSectorEnArchivo = numSectorDentroDelBloque * this->disco->capacidadDelSector;
-        // cout<<"findNumBloqueQueApuntaAlSector: "<<findNumBloqueQueApuntaAlSector<<"\n";
-        
-        cout<<"DATA:\n"<<lineas::linea100<<lineas::linea50<<"\n";
-        ifstream bloqueUbicado("disk/bloque"+std::to_string(findNumBloqueQueApuntaAlSector)+".bin",ios::binary);
-        bloqueUbicado.seekg(posicionDelSectorEnArchivo);
-        char c; int contadorFila = 1;
-        while(!bloqueUbicado.eof() ){
-            bloqueUbicado.read(static_cast<char*>(&c),sizeof(char));
-            cout << static_cast<int>(c);
-            contadorFila++;
-            //if(contadorFila%125==0){ cout<<"\n"; }
-        }
-        bloqueUbicado.close();
-
-        cout<<"\n"<<lineas::linea100<<lineas::linea50<<"\n";
-    }
-
-    void printBloque(int numBloque){
-
     }
 
     void convertCSV_inTuplas(string fileAimportar, string newfile,int natributos){
@@ -327,35 +418,33 @@ public:
         i.close(); 
         f.close(); 
     }
-    
-    void printSector(int numSector){
-        cout<<"\n"<<lineas::drawLinea(75)<<" | SECTOR "<<numSector<<" | "<<lineas::drawLinea(75)<<"\n";
-        this->disco->sectores[numSector-1].showInfoSector(); // Imprime info: en que plato, superficie, pista esta
-        
-        int findNumBloqueQueApuntaAlSector = std::ceil(static_cast<double>(numSector) / this->numSectoresPorBloque);
-        int numSectorDentroDelBloque = numSector % this->numSectoresPorBloque; //((numSector-1) % this->numSectoresPorBloque == 0) ? ((numSector-1)/this->numSectoresPorBloque) : ((numSector-1)/this->numSectoresPorBloque)+1;;
-        int posicionDelSectorEnArchivo = numSectorDentroDelBloque * this->disco->capacidadDelSector;
-        // cout<<"findNumBloqueQueApuntaAlSector: "<<findNumBloqueQueApuntaAlSector<<"\n";
-        
-        cout<<"DATA:\n"<<lineas::linea100<<lineas::linea50<<"\n";
-        ifstream bloqueUbicado("disk/bloque"+std::to_string(findNumBloqueQueApuntaAlSector)+".bin",ios::binary);
-        bloqueUbicado.seekg(posicionDelSectorEnArchivo);
-        char c; int contadorFila = 1;
-        for(int i=0; i<this->disco->capacidadDelSector;i++){
-            bloqueUbicado.read(static_cast<char*>(&c),sizeof(char));
-            cout << c;
-            //cout << static_cast<int>(c);
-            contadorFila++;
-            //if(contadorFila%125==0){ cout<<"\n"; }
-        }
-        bloqueUbicado.close();
 
-        cout<<"\n"<<lineas::linea100<<lineas::linea50<<"\n";
+    void printSector(int nSector){
+        cout<<"\n"<<lineas::drawLinea(75)<<" | SECTOR "<<nSector<<" | "<<lineas::drawLinea(75)<<"\n";
+        
+        int _pista,_superf,_plat;
+        _pista = ((nSector) % disco->numSectoresPorPista == 0) ? ((nSector)/disco->numSectoresPorPista) : ((nSector)/disco->numSectoresPorPista)+1;
+        _superf = (_pista % disco->numPistasPorSuperficie == 0) ? (_pista/disco->numPistasPorSuperficie) : (_pista/disco->numPistasPorSuperficie)+1;
+        _plat = (_superf % 2 == 0) ? (_superf/2) : (_superf/2)+1;
+        char c;
+        cout << "\t" << " IdSector: " << nSector << endl;
+        cout << "\t" << " numDePista: " << _pista << endl;
+        cout << "\t" << " numDeSuperficie: " << _superf << endl;
+        cout << "\t" << " numDePlato: " << _plat << endl;
+        cout<<"DATA:\n"<<lineas::linea100<<lineas::linea50<<"\n";
+        ifstream input("HDD/Plato" + to_string(_plat)+"/Superficie"+to_string(_superf)+"/Pista"+to_string(_pista)+"/Sector"+to_string(nSector)+".bin", std::ios::binary);
+        for(int i=0; i<this->disco->capacidadDelSector;i++){
+        input.read(static_cast<char*>(&c),sizeof(char));
+        cout << c;
+        }        cout<<"\n"<<lineas::linea100<<lineas::linea50<<"\n";
+        input.close();
     }
 
     void printBloque(int numBloque){
         cout<<"\n"<<lineas::drawLinea(75)<<" | BLOQUE "<<numBloque<<" | "<<lineas::drawLinea(75)<<"\n";
         //this->disco->sectores[numSector-1].showInfoSector(); // Imprime info: en que plato, superficie, pista esta
+        
+        
         cout<<"DATA:\n"<<lineas::linea100<<lineas::linea50<<"\n";
         ifstream bloqueUbicado("disk/bloque"+std::to_string(numBloque)+".bin",ios::binary);
         char c; int contadorFila = 1;

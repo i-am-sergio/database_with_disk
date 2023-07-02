@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cstring>
 #include "DiskController.h"
-#include "Disco.h"
+#include "HeadersHDD/Disco.h"
 #include "SGDB.h"
 using namespace std;
 
@@ -27,6 +27,7 @@ int main(){
             cout<<"[2] Imprimir Metadata Bloque n\n";
             cout<<"[3] Imprimir Metadata Registro n\n";
             cout<<"[4] Mostrar informacion del disco n\n";
+            cout<<"[5] Prueba SlottedPage\n";
             cin>>opc2;
             cin.ignore();
             if(opc2==1){
@@ -47,6 +48,10 @@ int main(){
                 myDiskController.printBloque(ubi);
             }else if (opc2 == 4) {
                 myDiskController.disco->showInfoDisco();
+            }else if (opc2 == 5) {
+                myDiskController.setBloque_SlottedPage(1);
+            }else if (opc2 == 6) {
+                myDiskController.readPrueba_SlottedPage(1);
             }
 
         } else if(opc==2){
@@ -94,6 +99,7 @@ int main(){
                     sistema.insertRegistroLongitudFija(prompt);
                 } else if(opDeRegistro==2){
                     cout<<"---> Se inserto registro de longitud variable\n";
+                    sistema.insertRegistroLongitudVariable(prompt);
                 }
                 cout<<"INSERT query OK 1 row affected!!!\n";
             } else if(opc2==5){ // Delete un registro
@@ -101,7 +107,7 @@ int main(){
                 //cout<<" >> ";
                 string prompt = "DELETE FROM titanic WHERE PassengerId = 15";
                 cin>>opDeRegistro;
-                sistema.deleteRegistro(prompt);
+                //sistema.deleteRegistro(prompt);
                 cout<<"INSERT query OK 1 row affected!!!\n";
             } else if(opc2==6){
                 sistema.showTable("titanic");

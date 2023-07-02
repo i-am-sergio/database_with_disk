@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <cstdint>
-#include "Sector.h"
+#include "Plato.h"
 using namespace std;
 
 class Disco{
@@ -23,15 +23,16 @@ class Disco{
         int totalSectoresEnDisco;
         int totalPistasEnDisco;
         int totalSuperficiesEnDisco;
-        
-        vector <Sector> sectores;
+
+        vector<Plato> platos;
+        //vector <Sector> sectores;
 
         int getNumBloques(){
             return (this->capacidadTotalBytes/(this->capacidadDelSector*this->sectoresPorBloque));
         }
         
         Disco(){
-            std::fstream archivo("structDisk.bin", std::ios::in | std::ios::binary);
+            std::fstream archivo("HeadersHDD/structDisk.bin", std::ios::in | std::ios::binary);
             //archivo.seekg(0, std::ios::end);
             if(archivo){
                 cout<<"Se encontro una estructura de disco.\n";
@@ -46,7 +47,7 @@ class Disco{
             } else {
                 cout<<"No se encontro una estructura del disco. Ingrese los siguientes datos para crear uno nuevo.\n";
                 string aux;
-                std::fstream archivo("structDisk.bin", std::ios::out | std::ios::binary);
+                std::fstream archivo("HeadersHDD/structDisk.bin", std::ios::out | std::ios::binary);
                 cout<<"Ingrese el numero de Platos: ";getline(cin,aux);
                 this->numPlatos = stoi(aux);
                 cout<<"Ingrese el numero de Pistas por Superficie: ";getline(cin,aux);
@@ -65,25 +66,22 @@ class Disco{
                 archivo.write(reinterpret_cast<char*>(&sectoresPorBloque), sizeof(sectoresPorBloque));
                 cout<<this->numPlatos<<"-"<<this->numPistasPorSuperficie<<"-"<<this->numSectoresPorPista<<"-"<<this->capacidadDelSector<<"-"<<this->sectoresPorBloque<<"\n";
             }
-            buildSectores();
+            buildDisk();
         };
-        
-        void buildSectores(){ //5,8,20,100,10
+
+
+        void buildDisk(){
             this->capacidadTotalBytes = capacidadDelSector * numSectoresPorPista * numPistasPorSuperficie * 2 * numPlatos; 
             this->capacidadTotalBits = this->capacidadTotalBytes * 8;
             this->totalSectoresEnDisco = capacidadTotalBytes / capacidadDelSector;
             this->totalPistasEnDisco = totalSectoresEnDisco / numSectoresPorPista;
             this->totalSuperficiesEnDisco = numPlatos * 2;
             showInfoDisco();
-            int _pista,_superf,_plat;
-            for(int i=0; i<totalSectoresEnDisco;i++){
-                _pista = ((i+1) % numSectoresPorPista == 0) ? ((i+1)/numSectoresPorPista) : ((i+1)/numSectoresPorPista)+1;
-                _superf = (_pista % numPistasPorSuperficie == 0) ? (_pista/numPistasPorSuperficie) : (_pista/numPistasPorSuperficie)+1;
-                _plat = (_superf % 2 == 0) ? (_superf/2) : (_superf/2)+1;
-                sectores.emplace_back(i+1,_pista,_superf,_plat);
-                //cout<<"Sector "<<i+1<<"\n";
+            for(int i=1; i<=numPlatos; i++){
+              platos.emplace_back(i,numSectoresPorPista,numPistasPorSuperficie,capacidadDelSector);
             }
-        }
+        } 
+        //void disk(){ //5,8,20,100,10
 
         void showInfoDisco() {
             std::cout << "INFORMACION DEL DISCO:\n";

@@ -1,13 +1,13 @@
 {
     "workbench.colorCustomizations": {
-        "commandCenter.border": "#e7e7e799",
-        "sash.hoverBorder": "#1f6fd0",
-        "titleBar.activeBackground": "#1857a4",
-        "titleBar.activeForeground": "#e7e7e7",
-        "titleBar.inactiveBackground": "#1857a499",
-        "titleBar.inactiveForeground": "#e7e7e799"
+        "sash.hoverBorder": "#bcf5bc",
+        "statusBar.background": "#90ee90",
+        "statusBar.foreground": "#15202b",
+        "statusBarItem.hoverBackground": "#64e764",
+        "statusBarItem.remoteBackground": "#90ee90",
+        "statusBarItem.remoteForeground": "#15202b"
     },
-    "peacock.color": "#1857a4",
+    "peacock.color": "#90EE90",
     "files.associations": {
         "*.excalidraw": "json",
         "*.excalidrawlib": "json",
