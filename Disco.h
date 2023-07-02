@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <fstream>
+#include <string>
 #include <vector>
 #include <cstdint>
 #include "Sector.h"
@@ -29,10 +30,11 @@ class Disco{
             return (this->capacidadTotalBytes/(this->capacidadDelSector*this->sectoresPorBloque));
         }
         
-        Disco(string nameStructDisk,int numPlatos,int numPistasPorSuperficie,int numSectoresPorPista,int capacidadDelSector,int sectoresPorBloque){
+        Disco(){
             std::fstream archivo("structDisk.bin", std::ios::in | std::ios::binary);
             //archivo.seekg(0, std::ios::end);
             if(archivo){
+                cout<<"Se encontro una estructura de disco.\n";
                 archivo.seekg(0, std::ios::beg);
                 archivo.read(reinterpret_cast<char*>(&this->numPlatos), sizeof(numPlatos));
                 archivo.read(reinterpret_cast<char*>(&this->numPistasPorSuperficie), sizeof(numPistasPorSuperficie));
@@ -42,12 +44,20 @@ class Disco{
                 cout<<this->numPlatos<<"-"<<this->numPistasPorSuperficie<<"-"<<this->numSectoresPorPista<<"-"<<this->capacidadDelSector<<"-"<<this->sectoresPorBloque<<"\n";
                 archivo.close();
             } else {
+                cout<<"No se encontro una estructura del disco. Ingrese los siguientes datos para crear uno nuevo.\n";
+                string aux;
                 std::fstream archivo("structDisk.bin", std::ios::out | std::ios::binary);
-                this->numPlatos = numPlatos;
-                this->numPistasPorSuperficie = numPistasPorSuperficie;
-                this->numSectoresPorPista = numSectoresPorPista;
-                this->capacidadDelSector = capacidadDelSector;
-                this->sectoresPorBloque = sectoresPorBloque;
+                cout<<"Ingrese el numero de Platos: ";getline(cin,aux);
+                this->numPlatos = stoi(aux);
+                cout<<"Ingrese el numero de Pistas por Superficie: ";getline(cin,aux);
+                this->numPistasPorSuperficie = stoi(aux);
+                cout<<"Ingrese el numero de Sectores por Pista: ";getline(cin,aux);
+                this->numSectoresPorPista = stoi(aux);
+                cout<<"Ingrese la capacidad del Sector: ";getline(cin,aux);
+                this->capacidadDelSector = stoi(aux);
+                cout<<"Ingrese la cantidad de sectores por bloque: ";getline(cin,aux);
+                this->sectoresPorBloque = stoi(aux);
+                cin.ignore();
                 archivo.write(reinterpret_cast<char*>(&numPlatos), sizeof(numPlatos));
                 archivo.write(reinterpret_cast<char*>(&numPistasPorSuperficie), sizeof(numPistasPorSuperficie));
                 archivo.write(reinterpret_cast<char*>(&numSectoresPorPista), sizeof(numSectoresPorPista));
@@ -76,18 +86,18 @@ class Disco{
         }
 
         void showInfoDisco() {
-            std::cout << "capacidadTotalBytes: " << capacidadTotalBytes << std::endl;
-            std::cout << "capacidadTotalBits: " << capacidadTotalBits << std::endl;
-            std::cout << "numPlatos: " << numPlatos << std::endl;
-            std::cout << "numPistasPorSuperficie: " << numPistasPorSuperficie << std::endl;
-            std::cout << "numSectoresPorPista: " << numSectoresPorPista << std::endl;
-            std::cout << "capacidadDelSector: " << capacidadDelSector << std::endl;
-            std::cout << "sectoresPorBloque: " << sectoresPorBloque << std::endl;
-            std::cout << "totalSectoresEnDisco: " << totalSectoresEnDisco << std::endl;
-            std::cout << "totalPistasEnDisco: " << totalPistasEnDisco << std::endl;
-            std::cout << "totalSuperficiesEnDisco: " << totalSuperficiesEnDisco << std::endl;
+            std::cout << "INFORMACION DEL DISCO:\n";
+            std::cout << "  CapacidadTotalBytes: " << capacidadTotalBytes << std::endl;
+            std::cout << "  CapacidadTotalBits: " << capacidadTotalBits << std::endl;
+            std::cout << "  NumPlatos: " << numPlatos << std::endl;
+            std::cout << "  NumPistasPorSuperficie: " << numPistasPorSuperficie << std::endl;
+            std::cout << "  NumSectoresPorPista: " << numSectoresPorPista << std::endl;
+            std::cout << "  CapacidadDelSector: " << capacidadDelSector << std::endl;
+            std::cout << "  SectoresPorBloque: " << sectoresPorBloque << std::endl;
+            std::cout << "  TotalSectoresEnDisco: " << totalSectoresEnDisco << std::endl;
+            std::cout << "  TotalPistasEnDisco: " << totalPistasEnDisco << std::endl;
+            std::cout << "  TotalSuperficiesEnDisco: " << totalSuperficiesEnDisco << std::endl<<endl;
         }
-
 
         ~Disco(){}
 

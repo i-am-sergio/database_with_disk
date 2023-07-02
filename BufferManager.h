@@ -44,21 +44,12 @@ public:
     }
     ~BufferManager() { }
 
-    bool loadNewPage (int page_id){ 
-        return false;
-    }
 
-    auto GetPages() {
-        return bufferPool; 
-    }
     auto getPageOfBuuferPool(int pageId){
         Page* pagina = LRU(pageId);
         return pagina;
     }
-    bool vaciarPage(int page_id){
-        return 0;
-    }
-    void vaciarAllPages(){}
+
 
     Page* LRU(int pageId){
         for (int i=0; i<pageTable.size(); i++){
@@ -88,11 +79,11 @@ public:
                 return &bufferPool[i];
             }  
         }
+
         int mayor = pageTable[0][4];
         int pos=0;
         for (int i=0; i<pageTable.size(); i++){
             if(pageTable[i][2]==0 && pageTable[i][4]>mayor){
-                cout<<"\t\tENTRO AL IF\n";
                 mayor = pageTable[i][4];
                 pos = i;
             }
@@ -110,17 +101,17 @@ public:
             pageTable[pos][4] = 0;
             return &bufferPool[pos];
         }
-        return nullptr;
+        //Implementar el pin y unpin para el dirty bit
+        //
+       return nullptr;
     }
 
     Page* Clock(int pageId){
-
-
-
         return nullptr;
     }
 
     void showPageTable(){
+        cout<<"\n LRU tabla \n";
         for (int i=0; i<pageTable.size(); i++){
             for (int j=0; j<pageTable[0].size(); j++){
                 cout<<pageTable[i][j]<<"\t";
@@ -129,7 +120,5 @@ public:
         }
         cout<<"\n";
     }
-    //auto UnpinPage(page_id_t page_id, bool is_dirty, AccessType access_type = AccessType::Unknown) -> bool;
 };
-
 

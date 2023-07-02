@@ -93,7 +93,7 @@ public:
             getline(stream,w3,'#');
             info.push_back(make_tuple(w1,w2,stoi(w3)));
         }
-        cout<<info.size()<<"tam"<<endl;
+        //cout<<info.size()<<"tam"<<endl;
         //   for(int i=0; i<(int)info.size(); i++){
         //     cout<<get<0>(info[i])<<"-"; 
         //     cout<<get<1>(info[i])<<"-"; 
@@ -103,11 +103,10 @@ public:
     }
 
     void uploadTableToDisk(string fileToImport, string tablaName){ //(const char * tablaNameFile, int sizeFile)
-        // prepareCSV_inTuplas(tablaNameFile);
-
 
         tableToVector(tablaName);
-        convertCSV_inTuplas(fileToImport,tablaName,info.size());
+        cout<<"size -> "<<info.size()<<endl;
+        convertCSV_inTuplas(fileToImport,tablaName,(int)info.size());
 
         const char* carpetaDisco = "disco\\";
 
@@ -190,8 +189,7 @@ public:
         //readSchemaBloquesFijos();
     }
 
-void setDataInBloques(int sizeRegistro){
-
+    void setDataInBloques(int sizeRegistro){
         int contador = 1;
         int contadorBytesTotal;
         int contAux = 0;
@@ -267,36 +265,9 @@ void setDataInBloques(int sizeRegistro){
         schemaBloques.close();
     }
 
-    void printSector(int numSector){
-        cout<<"\n"<<lineas::drawLinea(75)<<" | SECTOR "<<numSector<<" | "<<lineas::drawLinea(75)<<"\n";
-        this->disco->sectores[numSector-1].showInfoSector(); // Imprime info: en que plato, superficie, pista esta
-        
-        int findNumBloqueQueApuntaAlSector = std::ceil(static_cast<double>(numSector) / this->numSectoresPorBloque);
-        int numSectorDentroDelBloque = numSector % this->numSectoresPorBloque;
-        int posicionDelSectorEnArchivo = numSectorDentroDelBloque * this->disco->capacidadDelSector;
-        // cout<<"findNumBloqueQueApuntaAlSector: "<<findNumBloqueQueApuntaAlSector<<"\n";
-        
-        cout<<"DATA:\n"<<lineas::linea100<<lineas::linea50<<"\n";
-        ifstream bloqueUbicado("disk/bloque"+std::to_string(findNumBloqueQueApuntaAlSector)+".bin",ios::binary);
-        bloqueUbicado.seekg(posicionDelSectorEnArchivo);
-        char c; int contadorFila = 1;
-        while(!bloqueUbicado.eof() ){
-            bloqueUbicado.read(static_cast<char*>(&c),sizeof(char));
-            cout << static_cast<int>(c);
-            contadorFila++;
-            //if(contadorFila%125==0){ cout<<"\n"; }
-        }
-        bloqueUbicado.close();
-
-        cout<<"\n"<<lineas::linea100<<lineas::linea50<<"\n";
-    }
-
-    void printBloque(int numBloque){
-
-    }
-
     void convertCSV_inTuplas(string fileAimportar, string newfile,int natributos){
-
+        cout<<"size -> "<<natributos<<endl;
+        tableToVector(newfile);
         ifstream i(fileAimportar, ios::in); 
         ofstream f(newfile,ios::out); 
         bool reemplazarActivo = true;
@@ -328,83 +299,48 @@ void setDataInBloques(int sizeRegistro){
         i.close(); 
         f.close(); 
     }
-
-    void prepareCSV_inTuplas(const char * CSVName)
-    {
-        ifstream archivoCSV(CSVName);
-        ofstream salida("tupla_titanic");
-
-        if (!archivoCSV)
-        {
-            cout << "No se pudo abrir el archivo de entrada." << endl;
-            return;
+    
+    void printSector(int numSector){
+        cout<<"\n"<<lineas::drawLinea(75)<<" | SECTOR "<<numSector<<" | "<<lineas::drawLinea(75)<<"\n";
+        this->disco->sectores[numSector-1].showInfoSector(); // Imprime info: en que plato, superficie, pista esta
+        
+        int findNumBloqueQueApuntaAlSector = std::ceil(static_cast<double>(numSector) / this->numSectoresPorBloque);
+        int numSectorDentroDelBloque = numSector % this->numSectoresPorBloque; //((numSector-1) % this->numSectoresPorBloque == 0) ? ((numSector-1)/this->numSectoresPorBloque) : ((numSector-1)/this->numSectoresPorBloque)+1;;
+        int posicionDelSectorEnArchivo = numSectorDentroDelBloque * this->disco->capacidadDelSector;
+        // cout<<"findNumBloqueQueApuntaAlSector: "<<findNumBloqueQueApuntaAlSector<<"\n";
+        
+        cout<<"DATA:\n"<<lineas::linea100<<lineas::linea50<<"\n";
+        ifstream bloqueUbicado("disk/bloque"+std::to_string(findNumBloqueQueApuntaAlSector)+".bin",ios::binary);
+        bloqueUbicado.seekg(posicionDelSectorEnArchivo);
+        char c; int contadorFila = 1;
+        for(int i=0; i<this->disco->capacidadDelSector;i++){
+            bloqueUbicado.read(static_cast<char*>(&c),sizeof(char));
+            cout << c;
+            //cout << static_cast<int>(c);
+            contadorFila++;
+            //if(contadorFila%125==0){ cout<<"\n"; }
         }
-        if (!salida)
-        {
-            cout << "No se pudo abrir el archivo de salida." << endl;
-            return;
-        }
+        bloqueUbicado.close();
 
-        char c;
-        bool dentroDeComillas = false;
-        while (archivoCSV.get(c))
-        {
-            if (c == '"' && dentroDeComillas == false) {
-                dentroDeComillas = true;
-            }
-            else if (c == '"' && dentroDeComillas == true) {
-                dentroDeComillas = false;
-            }
-            if (c == ',' && dentroDeComillas == false) {
-                salida << '#';
-            }
-            else {
-                salida << c;
-            }
-        }
-        archivoCSV.close();
-        salida.close();
-        cout << "Se ha generado tupla_" << CSVName << endl;
+        cout<<"\n"<<lineas::linea100<<lineas::linea50<<"\n";
     }
 
-    int findEsquemaDeTabla(const char * tablaName){
-        ifstream esquemaTabla("esquema.txt");
-        if ( !esquemaTabla.is_open()) { std::cout << "Error al abrir el archivo." << std::endl; }
-
-        char c;
-        int contadorSizeTablaName = 0;
-        int indice = 0;
-        char tablaNameDelEsquema[50];
-        char * ptr = tablaNameDelEsquema;
-        streampos posicion;
-        // buscar tabla en esquema
-        while(true){
-            contadorSizeTablaName = 0;
-            while(esquemaTabla.get(c)){ // obtiene el nombre hasta el simbolo #
-                indice++;
-                if(c=='#') 
-                    break;
-                tablaNameDelEsquema[contadorSizeTablaName] = c;
-                contadorSizeTablaName++;
-            }
-            tablaNameDelEsquema[contadorSizeTablaName] = '\0';
-
-            if(strcmp(ptr,tablaName)==0){ // Si es la tabla?
-                cout<<"encontro la tabla:\n";
-                cout<<"\n|"<<tablaName<<"|"<<endl;
-                cout<<"\n|"<<ptr<<"|"<<endl; 
-                posicion = esquemaTabla.tellg(); // esta correcto
-                //cout<<"extraer los sizes de los tipos de datos\n";
-                break;
-            } else {
-                do{
-                    esquemaTabla.get(c);
-                    indice++;
-                } while(c!='\n');
-                indice++;// IMPORTANTE CONTAR EL SALTO DE LINEA
-            }
+    void printBloque(int numBloque){
+        cout<<"\n"<<lineas::drawLinea(75)<<" | BLOQUE "<<numBloque<<" | "<<lineas::drawLinea(75)<<"\n";
+        //this->disco->sectores[numSector-1].showInfoSector(); // Imprime info: en que plato, superficie, pista esta
+        cout<<"DATA:\n"<<lineas::linea100<<lineas::linea50<<"\n";
+        ifstream bloqueUbicado("disk/bloque"+std::to_string(numBloque)+".bin",ios::binary);
+        char c; int contadorFila = 1;
+        while(!bloqueUbicado.eof() ){
+            bloqueUbicado.read(static_cast<char*>(&c),sizeof(char));
+            cout << c;
+            //cout << static_cast<int>(c);
+            contadorFila++;
+            //if(contadorFila%125==0){ cout<<"\n"; }
         }
-        esquemaTabla.close();
-        return indice;
+        bloqueUbicado.close();
+
+        cout<<"\n"<<lineas::linea100<<lineas::linea50<<"\n";
     }
+
 };
