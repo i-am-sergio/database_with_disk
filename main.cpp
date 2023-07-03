@@ -64,6 +64,7 @@ int main(){
             cout<<"[5] Delete 1 registro n\n";
             cout<<"[6] SELECT * FROM titanic\n";
             cout<<"[7] SELECT * FROM titanic where atributo = n\n";
+            cout<<"[8] PRUEBA RegistroVariable\n";
             cin>>opc2;
             cin.ignore();
 
@@ -121,6 +122,9 @@ int main(){
 
                 sistema.search(prompt,stoi(prompt2));
                 sistema.bufferManager->showPageTable();
+            } else if(opc2==8){
+                string prompt = "INSERT INTO titanic 892,0,3,\"Johnston, Miss. Catherine Helen Carrie\",female,,1,2,W./C. 6607,23.45,,S";
+                sistema.insertRegistroLongitudVariable(prompt);
             }
 
         } else if(opc==0){

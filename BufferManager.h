@@ -44,12 +44,10 @@ public:
     }
     ~BufferManager() { }
 
-
     auto getPageOfBuuferPool(int pageId){
         Page* pagina = LRU(pageId);
         return pagina;
     }
-
 
     Page* LRU(int pageId){
         for (int i=0; i<pageTable.size(); i++){
@@ -120,5 +118,6 @@ public:
         }
         cout<<"\n";
     }
+
 };
 
