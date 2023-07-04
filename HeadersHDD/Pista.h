@@ -6,7 +6,7 @@ using namespace std;
 
 class Pista{
   public:
-    // Info
+    //Atributos 
     int idPista;
     vector<Sector>sectores;
 
@@ -22,5 +22,4 @@ class Pista{
     void showInfo(){
       cout<<"idPista -> "<<idPista<<endl;
     }
-
 };

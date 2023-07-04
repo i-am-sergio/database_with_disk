@@ -25,7 +25,6 @@ class Disco{
         int totalSuperficiesEnDisco;
 
         vector<Plato> platos;
-        //vector <Sector> sectores;
 
         int getNumBloques(){
             return (this->capacidadTotalBytes/(this->capacidadDelSector*this->sectoresPorBloque));
@@ -44,6 +43,8 @@ class Disco{
                 archivo.read(reinterpret_cast<char*>(&this->sectoresPorBloque), sizeof(sectoresPorBloque));
                 cout<<this->numPlatos<<"-"<<this->numPistasPorSuperficie<<"-"<<this->numSectoresPorPista<<"-"<<this->capacidadDelSector<<"-"<<this->sectoresPorBloque<<"\n";
                 archivo.close();
+
+              buildDisk();
             } else {
                 cout<<"No se encontro una estructura del disco. Ingrese los siguientes datos para crear uno nuevo.\n";
                 string aux;
@@ -65,10 +66,16 @@ class Disco{
                 archivo.write(reinterpret_cast<char*>(&capacidadDelSector), sizeof(capacidadDelSector));
                 archivo.write(reinterpret_cast<char*>(&sectoresPorBloque), sizeof(sectoresPorBloque));
                 cout<<this->numPlatos<<"-"<<this->numPistasPorSuperficie<<"-"<<this->numSectoresPorPista<<"-"<<this->capacidadDelSector<<"-"<<this->sectoresPorBloque<<"\n";
+                buildDisk();
+                ofstream file("dictionary/dictionary.bin",ios::binary);
+                    int nBloques = getNumBloques();
+                    file.write(reinterpret_cast<char*>(&nBloques), sizeof(int));
+                    nBloques = 0;
+                    file.write(reinterpret_cast<char*>(&nBloques), sizeof(int));
+                    file.write(reinterpret_cast<char*>(&nBloques), sizeof(int));
+                file.close();
             }
-            buildDisk();
         };
-
 
         void buildDisk(){
             this->capacidadTotalBytes = capacidadDelSector * numSectoresPorPista * numPistasPorSuperficie * 2 * numPlatos; 
@@ -78,7 +85,7 @@ class Disco{
             this->totalSuperficiesEnDisco = numPlatos * 2;
             showInfoDisco();
             for(int i=1; i<=numPlatos; i++){
-              platos.emplace_back(i,numSectoresPorPista,numPistasPorSuperficie,capacidadDelSector);
+                platos.emplace_back(i,numSectoresPorPista,numPistasPorSuperficie,capacidadDelSector);
             }
         } 
         //void disk(){ //5,8,20,100,10
@@ -98,5 +105,4 @@ class Disco{
         }
 
         ~Disco(){}
-
 };

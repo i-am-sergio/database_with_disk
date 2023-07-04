@@ -1,6 +1,1 @@
-*.excalidraw
-/disk
-/test/*.exe
-main.exe
-disco.exe
-HDD
+./eject

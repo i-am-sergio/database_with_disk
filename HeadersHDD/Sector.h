@@ -7,7 +7,7 @@ using namespace std;
 
 class Sector{
 public:
-    // Info
+    // Atributos 
     int idSector;
     int idPista;
     int idSuperficie;

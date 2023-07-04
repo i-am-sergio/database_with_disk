@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 using namespace std;
-
+  
 class Superficie{
   public:
     // Info
@@ -23,5 +23,4 @@ class Superficie{
     void showInfo(){
       cout<<"idSuperficie -> "<<idSuperficie<<endl;
     }
-
 };

@@ -6,7 +6,7 @@ using namespace std;
 
 class Plato{
   public:
-    // Info
+    // Atributos 
     int idPlato;
     vector<Superficie>superficies;
 
@@ -18,5 +18,4 @@ class Plato{
       superficies.emplace_back(1,idPlato,numSectoresPorPista,numPistasPorSuperficie,capacidadDelSector);
       superficies.emplace_back(2,idPlato,numSectoresPorPista,numPistasPorSuperficie,capacidadDelSector);
     }
-
 };
