@@ -98,6 +98,7 @@ public:
         for (int i = bloqueInicial; i <= bloqueFinal; i++)
         { // Seteamos 10 bloques como slottedpage
             setBloque_SlottedPage(i);
+            bloqueASector(i);
         }
         cout<<"bloqueInicial => "<<bloqueInicial<<"\n";
         cout<<"bloqueFinal => "<<bloqueFinal<<"\n";
@@ -191,6 +192,7 @@ public:
             bloque.write(reinterpret_cast<char *>(&ptrFinDeFreeSpace), sizeof(int)); // Actualiza
             bloque.close();
         }
+        bloqueASector(bloqueId);
     }
 
     void buscarRegistroVariableEnBloque_SlottedPage(int bloqueId, vector<char> &registroVariable)

@@ -1,21 +1,11 @@
 {
     "workbench.colorCustomizations": {
-        "sash.hoverBorder": "#fa1b49",
-        "statusBar.background": "#dd0531",
+        "sash.hoverBorder": "#ff6433",
+        "statusBar.background": "#ff3d00",
         "statusBar.foreground": "#e7e7e7",
-        "statusBarItem.hoverBackground": "#fa1b49",
-        "statusBarItem.remoteBackground": "#dd0531",
+        "statusBarItem.hoverBackground": "#ff6433",
+        "statusBarItem.remoteBackground": "#ff3d00",
         "statusBarItem.remoteForeground": "#e7e7e7"
     },
-    "peacock.color": "#dd0531",
-    "files.associations": {
-        "*.excalidraw": "json",
-        "*.excalidrawlib": "json",
-        "string": "cpp",
-        "vector": "cpp",
-        "iostream": "cpp",
-        "istream": "cpp",
-        "iosfwd": "cpp",
-        "xstring": "cpp"
-    }
+    "peacock.color": "#ff3d00"
 }

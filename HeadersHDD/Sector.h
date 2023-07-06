@@ -40,12 +40,9 @@ public:
               buffer[j] = '*';
           }
           archivo.write(buffer, capacidadDelSector);
-          
           delete [] buffer;
           
           archivo.close();
-
-        //file.close();
     }
     
     void showInfoSector() {
